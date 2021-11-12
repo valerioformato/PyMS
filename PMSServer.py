@@ -2,7 +2,7 @@ import asyncio
 import json
 import websockets
 
-from PMSUtils.PMSExceptions import *
+from PyMS.PMSExceptions import *
 
 class PMSTask:
     def __init__(self, name, token):
