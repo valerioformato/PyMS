@@ -13,9 +13,7 @@ class PMSJob:
             "input": {
                 "files": []
             },
-            "output": {
-                "files": []
-            },
+            "output": None,
             "tags": [],
         }
 
@@ -45,12 +43,46 @@ class PMSJob:
         })
 
 
+    def AddOutputTransferWithTag(self, protocol, filename, destination, tag):
+        if self.job["output"] != None and not isinstance(self.job["output"], list):
+            print("Error: non-tagged file transfer already set up for this job")
+            exit
+
+        if self.job["output"] == None:
+            self.job["outout"] = []
+
+        matched_items = [item for item in self.job["output"] if item["tag"] == tag]
+
+        if len(matched_items) > 1:
+            raise RuntimeError("Two output file transfers with the same tag. Should not happen.")
+        elif len(matched_items) == 0:
+            self.job["output"].append({
+                "tag": tag,
+                "files": [{
+                    "protocol": protocol.name,
+                    "file": filename,
+                    "destination": destination
+                }]
+            })
+        # we have exactly one match
+        else:
+            matched_items[0]["files"].append({
+                "protocol": protocol.name,
+                "file": filename,
+                "destination": destination
+            })
+
     def AddOutputTransfer(self, protocol, filename, destination):
+        if self.job["output"] == None:
+            self.job["output"] = {
+                "files": []
+            }
+
         self.job["output"]["files"].append({
             "protocol": protocol.name,
             "file": filename,
             "destination": destination
-        })        
+        })
 
         
     # set files for stdout and stderr
