@@ -49,7 +49,7 @@ class PMSJob:
             exit
 
         if self.job["output"] == None:
-            self.job["outout"] = []
+            self.job["output"] = []
 
         matched_items = [item for item in self.job["output"] if item["tag"] == tag]
 
