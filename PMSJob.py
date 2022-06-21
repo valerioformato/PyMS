@@ -86,21 +86,10 @@ class PMSJob:
 
         
     # set files for stdout and stderr
-    def SetJobIO(self, name, destination):
+    def SetJobIO(self, name):
         self.job["stdin"] = ""
         self.job["stdout"] = f"{name}.out.log"
         self.job["stderr"] = f"{name}.err.log"
-
-        if destination.startswith("root://"):
-            protocol = "xrootd"
-        else:
-            protocol = "local"
-           
-        self.job["output"]["files"].append({
-            "protocol": protocol,
-            "file": "*.log",
-            "destination": destination
-        })
 
     def SetJobName(self, jobname):
         self.job["jobName"] = jobname
