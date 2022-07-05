@@ -21,6 +21,32 @@ class PMSServer:
     def __del__(self):
         self.loop.run_until_complete(self.__async__close_connection())
     
+    ## function to query job summary.
+    ## Parameters:
+    ##   (string) user
+    def Summary(self, user):
+        resp = self.loop.run_until_complete(self.send_to_orchestrator({
+            "command": "summary",
+            "user": user
+        }))
+
+        return resp
+
+    ## function to query job info.
+    ## Parameters:
+    ##   (name=string) query parameters
+    ##   (filter="string1,string2,...,stringN") selected fields
+    def QueryJobs(self, **kwargs):
+        request = {"command": "findJobs"}
+        for name,value in kwargs:
+            if name == 'filter':
+                request['filter'][name] = 1
+            else:
+                request['match'][name] = value
+
+        resp = self.loop.run_until_complete(self.send_to_orchestrator(request))
+        return resp
+
     ## function to create a new task.
     ## Parameters:
     ##   (string) taskname
