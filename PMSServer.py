@@ -37,8 +37,8 @@ class PMSServer:
     ##   (name=string) query parameters
     ##   (filter="string1,string2,...,stringN") selected fields
     def QueryJobs(self, **kwargs):
-        request = {"command": "findJobs"}
-        for name,value in kwargs:
+        request = {"command": "findJobs",  "match": {}, "filter": {}}
+        for name,value in kwargs.items():
             if name == 'filter':
                 request['filter'][name] = 1
             else:
