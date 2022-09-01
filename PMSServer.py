@@ -16,6 +16,7 @@ class PMSServer:
         self.uri = f"ws://{address}/server"
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(self.__async__connect())        
+        self.verbose = False
         pass
 
     def __del__(self):
@@ -40,12 +41,14 @@ class PMSServer:
         request = {"command": "findJobs",  "match": {}, "filter": {}}
         for name,value in kwargs.items():
             if name == 'filter':
-                request['filter'][name] = 1
+                fields = value.split(',')
+                for field in fields:
+                    request['filter'][field] = 1
             else:
                 request['match'][name] = value
 
         resp = self.loop.run_until_complete(self.send_to_orchestrator(request))
-        return resp
+        return json.loads(resp)
 
     ## function to create a new task.
     ## Parameters:
@@ -148,15 +151,15 @@ class PMSServer:
             raise JobOperationFailed(resp)
         
     async def __async__connect(self):
-        self.websocket = await websockets.connect(self.uri)
+        self.websocket = await websockets.connect(self.uri, ping_timeout = None, max_size = None)
         
     async def __async__close_connection(self):
         await self.websocket.close()
         
-    async def send_to_orchestrator(self, msg, verbose = True):
+    async def send_to_orchestrator(self, msg):
         await self.websocket.send(json.dumps(msg))
     
         response = await self.websocket.recv()
-        if verbose:
+        if self.verbose:
             print(f"PMS Server replied: {response}")
         return response
