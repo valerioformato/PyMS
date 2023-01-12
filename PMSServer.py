@@ -143,7 +143,7 @@ class PMSServer:
             "job": job.job,
             "task": task.name,
             "token": task.token
-        }, False) )
+        }) )
         
         if resp.startswith("Job received"):
             return resp.split(" ")[-1]
