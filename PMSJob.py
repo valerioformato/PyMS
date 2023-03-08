@@ -5,6 +5,7 @@ from enum import Enum
 class IOType(Enum):
     local = 0
     xrootd = 1
+    gfal = 2
 
 class PMSJob:
     def __init__(self):
@@ -38,7 +39,7 @@ class PMSJob:
     def AddInputTransfer(self, protocol, filename, source):
         self.job["input"]["files"].append({
             "protocol": protocol.name,
-            "file": outfilename,
+            "file": filename,
             "source": source
         })
 

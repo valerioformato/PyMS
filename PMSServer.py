@@ -31,7 +31,7 @@ class PMSServer:
             "user": user
         }))
 
-        return resp
+        return json.loads(resp)
 
     ## function to query job info.
     ## Parameters:
