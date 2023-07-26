@@ -79,6 +79,21 @@ class PMSServer:
         else:
             raise TaskOperationFailed(resp)
     
+    ## function to reset failed jobs in an existing task.
+    ## Parameters:
+    ##   (PMSTask) task
+    def ResetFailedJobs(self, task):
+        resp = self.loop.run_until_complete( self.send_to_orchestrator({
+            "command": "resetFailedJobs",
+            "task": task.name,
+            "token": task.token
+        }) )
+        
+        if not "failed" in resp:
+            return resp
+        else:
+            raise TaskOperationFailed(resp)
+    
     ## function to remove all jobs from an existing task.
     ## Parameters:
     ##   (PMSTask) task
