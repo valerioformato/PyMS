@@ -1,5 +1,6 @@
 import asyncio
 import json
+import sys
 import websockets
 
 from PyMS.PMSExceptions import *
@@ -19,9 +20,10 @@ class PMSServer:
         self.verbose = False
         pass
 
-    def __del__(self):
+    def CloseConnection(self):
         self.loop.run_until_complete(self.__async__close_connection())
-    
+        pass
+        
     ## function to query job summary.
     ## Parameters:
     ##   (string) user
@@ -37,8 +39,8 @@ class PMSServer:
     ## Parameters:
     ##   (name=string) query parameters
     ##   (filter="string1,string2,...,stringN") selected fields
-    def QueryJobs(self, **kwargs):
-        request = {"command": "findJobs",  "match": {}, "filter": {}}
+    def QueryJobs(self, command, **kwargs):
+        request = {"command": command,  "match": {}, "filter": {}}
         for name,value in kwargs.items():
             if name == 'filter':
                 fields = value.split(',')
@@ -47,8 +49,13 @@ class PMSServer:
             else:
                 request['match'][name] = value
 
+        print(request)
+        sys.stdout.flush()
         resp = self.loop.run_until_complete(self.send_to_orchestrator(request))
-        return json.loads(resp)
+        if command == "findJobs":
+            return json.loads(resp)
+        else:
+            return resp
 
     ## function to create a new task.
     ## Parameters:
