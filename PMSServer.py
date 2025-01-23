@@ -11,13 +11,18 @@ class PMSTask:
         self.token = token
 
 class PMSServer:
-    def __init__(self, address):
+    def __init__(self, address, autoconnect=True):
         self.websocket = None
         self.address = address
         self.uri = f"ws://{address}/server"
         self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.__async__connect())        
         self.verbose = False
+        if autoconnect:
+            self.Connect()
+        pass
+
+    def Connect(self):
+        self.loop.run_until_complete(self.__async__connect())
         pass
 
     def CloseConnection(self):
@@ -53,6 +58,28 @@ class PMSServer:
         sys.stdout.flush()
         resp = self.loop.run_until_complete(self.send_to_orchestrator(request))
         if command == "findJobs":
+            return json.loads(resp)
+        else:
+            return resp
+
+    ## function to query job info.
+    ## Parameters:
+    ##   (name=string) query parameters
+    ##   (filter="string1,string2,...,stringN") selected fields
+    def QueryPilots(self, command, **kwargs):
+        request = {"command": command,  "match": {}, "filter": {}}
+        for name,value in kwargs.items():
+            if name == 'filter':
+                fields = value.split(',')
+                for field in fields:
+                    request['filter'][field] = 1
+            else:
+                request['match'][name] = value
+
+        print(request)
+        sys.stdout.flush()
+        resp = self.loop.run_until_complete(self.send_to_orchestrator(request))
+        if command == "findPilots":
             return json.loads(resp)
         else:
             return resp
